@@ -32,8 +32,8 @@ header = ['task-pid',
           'hardirq-softirq',
           'preempt-depth',
           'timestamp',
-          'parent-process',
-          'child-process']
+          'child-process',
+          'parent-process']
 
 # column values for data frame
 task_pid  = []
@@ -44,8 +44,8 @@ need_resched_lazy = []
 hardirq_softirq = []
 preempt_depth = []
 timestamp = []
-function_output = []
-function_input = []
+child_process = []
+parent_process = []
 
 # list of files to read
 list_filenames = []
@@ -116,10 +116,10 @@ for filename in list_filenames:
                                 temp_str += val[i]
                         timestamp_val = float(temp_str)
                         timestamp.append(timestamp_val)
-                    # storing function_output col
+                    # storing child_process col
                     elif c == 4:
-                        function_output.append(val)
-                    # storing function_input col
+                        child_process.append(val)
+                    # storing parent_process col
                     elif c == 5:
                         val = val.rstrip()
                         str_len = len(val)
@@ -127,7 +127,7 @@ for filename in list_filenames:
                         for i in range(0, str_len):
                             if val[i] != '<' and val [i] != '-':
                                 temp_str += val[i]
-                        function_input.append(temp_str)
+                        parent_process.append(temp_str)
 
 df = pd.DataFrame({ header[0]: task_pid,
                     header[1]: cpu_num,
@@ -137,7 +137,7 @@ df = pd.DataFrame({ header[0]: task_pid,
                     header[5]: hardirq_softirq,
                     header[6]: preempt_depth,
                     header[7]: timestamp,
-                    header[8]: function_output,
-                    header[9]: function_input})
+                    header[8]: child_process,
+                    header[9]: parent_process})
 
 print(df)
