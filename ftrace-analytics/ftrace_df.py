@@ -8,11 +8,11 @@ Procedure
     --------------------------------------
     * task-pid:                 String
     * cpu#:                     String
-    * irqs-off:                 Character [empty if null]
-    * need-resched:             Character [empty if null]
-    * need-resched_lazy:        Character [empty if null]
-    * hardirq-softirq:          Character [empty if null]
-    * preempt-depth:            Character [empty if null]
+    * irqs-off:                 Character ['null']
+    * need-resched:             Character ['null']
+    * need-resched_lazy:        Character ['null']
+    * hardirq-softirq:          Character ['null']
+    * preempt-depth:            Character ['null']
     * timestamp:                Float
     * parent-process:           String
     * child-process:            String
