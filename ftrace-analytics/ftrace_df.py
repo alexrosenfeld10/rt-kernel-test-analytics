@@ -16,9 +16,11 @@ Procedure
     * timestamp:                Float
     * parent-process:           String
     * child-process:            String
+3. Create output csv file based on the input filename
 
 usage: ftrace_df.py [-f [filenames] [-l [task-pid names to filter]]
 example: python ftrace_df.py -f out_pi_stress_0.txt -l ftrace.sh-3764
+example output: out_pi_stress_0.csv
 '''
 import argparse
 import pandas as pd
@@ -34,18 +36,6 @@ header = ['task-pid',
           'timestamp',
           'child-process',
           'parent-process']
-
-# column values for data frame
-task_pid  = []
-cpu_num = []
-irq_off = []
-need_resched = []
-need_resched_lazy = []
-hardirq_softirq = []
-preempt_depth = []
-timestamp = []
-child_process = []
-parent_process = []
 
 # list of files to read
 list_filenames = []
@@ -66,8 +56,22 @@ if args.list_filter != None:
 
 # read every file
 for filename in list_filenames:
+    # column values for data frame
+    task_pid  = []
+    cpu_num = []
+    irq_off = []
+    need_resched = []
+    need_resched_lazy = []
+    hardirq_softirq = []
+    preempt_depth = []
+    timestamp = []
+    child_process = []
+    parent_process = []
+
     # read filename line by line
     with open(filename) as fp:
+        output_filename = filename[:-4] + ".csv"
+
         for line_num, l in enumerate(fp):
             # ignoring header lines
             if line_num >= 13:
@@ -92,9 +96,9 @@ for filename in list_filenames:
                     elif c == 2:
                         str_len = len(val)
                         for i in range (0, str_len):
-                            curr_char = ''
+                            curr_char = 'null'
                             if val[i] == '.':
-                                curr_char = ''
+                                curr_char = 'null'
                             else:
                                 curr_char = val[i]
                             if i == 0:
@@ -129,15 +133,15 @@ for filename in list_filenames:
                                 temp_str += val[i]
                         parent_process.append(temp_str)
 
-df = pd.DataFrame({ header[0]: task_pid,
-                    header[1]: cpu_num,
-                    header[2]: irq_off,
-                    header[3]: need_resched,
-                    header[4]: need_resched_lazy,
-                    header[5]: hardirq_softirq,
-                    header[6]: preempt_depth,
-                    header[7]: timestamp,
-                    header[8]: child_process,
-                    header[9]: parent_process})
+    df = pd.DataFrame({ header[0]: task_pid,
+                        header[1]: cpu_num,
+                        header[2]: irq_off,
+                        header[3]: need_resched,
+                        header[4]: need_resched_lazy,
+                        header[5]: hardirq_softirq,
+                        header[6]: preempt_depth,
+                        header[7]: timestamp,
+                        header[8]: child_process,
+                        header[9]: parent_process})
 
-print(df)
+    df.to_csv(output_filename, sep=',')
