@@ -17,15 +17,15 @@ Procedure
     for strace_timestamp files:
     * columan name:             Data type
     --------------------------------------
+    * pid                       int
     * process_time              float
-    * function_name             String
-    * count                     int
-    * total time                float
+    * process_name              String
+    * parameter                 String
 
 3. Create output csv file based on the input filename
 
 usage: strace_df.py [-f [filenames]
-example: python strace_df.py -f strace_table.txt strace_timestamp
+example: python strace_df.py -f strace_table.txt strace_timestamps.txt
 example output: strace_table.csv strace_timestamp.csv
 '''
 import argparse
@@ -38,6 +38,11 @@ header = ["time",
           "calls",
           "errors",
           "syscall"]
+
+header2 = ["pid",
+           "process_time",
+           "process_name",
+           "parameter"]
 
 # list of files to read
 list_filenames = []
@@ -59,14 +64,10 @@ for filename in list_filenames:
     errors = []
     syscall = []
 
+    pid = []
     process_time = []
-    function_name = []
+    process_name = []
     parameter = []
-    count = []
-    total_time = []
-
-    meta_data = {}
-    update_cols = {}
 
     function_name = ""
     output_filename = filename[:-4] + ".csv"
@@ -114,9 +115,60 @@ for filename in list_filenames:
                             elif i == 5:
                                 syscall.append(val)
             if function_name == "strace_timestamp":
-                if line_num == 0:
+                if line_num >= 0:
                     line = l.split()
+                    print(l)
                     print(line)
+                    col = 0
+                    temp_parameter = ""
+                    for i, val in enumerate(line):
+                        if col == 0:
+                            print("pid: " + val)
+                            pid.append(val)
+                            col += 1
+                        elif col == 1:
+                            print("process_time: " + val)
+                            process_time.append(val)
+                            col += 1
+                        elif col == 2:
+                            if temp_parameter == "<...futex":
+                                process_name.append("futex")
+                                parameter.append("resumed")
+                                col += 3
+                            if temp_parameter == "<...clock_nanosleep":
+                                process_name.append("clock_nanosleep")
+                                parameter.append("resumed")
+                                col += 3
+                            for index, c in enumerate(val):
+                                if c != '(' and c != ')':
+                                    temp_parameter += c
+                                    print("1st temp_parameter: " + temp_parameter)
+                                if c == '(':
+                                    print("process_name: " + val[:index])
+                                    process_name.append(val[:index])
+                                    temp_parameter = temp_parameter[index:]
+                                    col += 1
+                                if c == ')':
+                                    col += 1
+                        elif col == 3:
+                            if i == len(line) - 1:
+                                temp_parameter += val + " "
+                                print("temp_parameter: " + temp_parameter)
+                                parameter.append(temp_parameter)
+                            else:
+                                for index, c in enumerate(val):
+                                    if c == ')':
+                                        val = val[:-1]
+                                        col += 1
+                            temp_parameter += val + " "
+                            print("temp_parameter: " + temp_parameter)
+                        elif col == 4:
+                            print("added")
+                            parameter.append(temp_parameter)
+                            col += 1
+                        else:
+                            print('---------')
+
     if function_name == "strace_table":
         df = pd.DataFrame({ header[0]: time,
                             header[1]: seconds,
@@ -128,4 +180,12 @@ for filename in list_filenames:
         df.to_csv(output_filename, sep=',')
         print("created " + output_filename)
     else:
-        print("strace_timestamp")
+        if len(pid) == len(process_time) == len(process_name) == len(parameter):
+            df = pd.DataFrame({ header2[0]: pid,
+                                header2[1]: process_time,
+                                header2[2]: process_name,
+                                header2[3]: parameter})
+            df.to_csv(output_filename, sep=",")
+            print("created " + output_filename)
+        else:
+            print("error... could not create csv")
