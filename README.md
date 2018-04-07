@@ -3,7 +3,7 @@
 
 ### Ftrace Analytics
 
-###### Ftrace function
+##### Ftrace function
 To data reduce ftrace function log files run this command:
 
 `python ftrace_df.py -f out_pi_stress/out_pi_stress_0.txt out_pi_stress/out_pi_stress_1.txt -l pi_stress`
@@ -17,20 +17,23 @@ This command will output two csv files as such:
 
 `created out_pi_stress/out_pi_stress_1.csv`
 
-###### Ftrace function graph
+##### Ftrace function graph
 ftrace_graph is not yet supported
 
 ---
 
 ### Strace Analytics
 
-###### Strace log files
+##### Strace log files
 To data reduce strace function log files run this command:
 
 `python strace_df.py -f strace_table.txt strace_timestamps.txt`
 `
 
-This command will output two csv files as such:
+* The `-f` represents the log files
+
+
+This commnd will output two csv files as such:
 
 `created strace_table.csv`
 
