@@ -117,17 +117,13 @@ for filename in list_filenames:
             if function_name == "strace_timestamp":
                 if line_num >= 0:
                     line = l.split()
-                    print(l)
-                    print(line)
                     col = 0
                     temp_parameter = ""
                     for i, val in enumerate(line):
                         if col == 0:
-                            print("pid: " + val)
                             pid.append(val)
                             col += 1
                         elif col == 1:
-                            print("process_time: " + val)
                             process_time.append(val)
                             col += 1
                         elif col == 2:
@@ -142,9 +138,7 @@ for filename in list_filenames:
                             for index, c in enumerate(val):
                                 if c != '(' and c != ')':
                                     temp_parameter += c
-                                    print("1st temp_parameter: " + temp_parameter)
                                 if c == '(':
-                                    print("process_name: " + val[:index])
                                     process_name.append(val[:index])
                                     temp_parameter = temp_parameter[index:]
                                     col += 1
@@ -153,7 +147,6 @@ for filename in list_filenames:
                         elif col == 3:
                             if i == len(line) - 1:
                                 temp_parameter += val + " "
-                                print("temp_parameter: " + temp_parameter)
                                 parameter.append(temp_parameter)
                             else:
                                 for index, c in enumerate(val):
@@ -161,13 +154,9 @@ for filename in list_filenames:
                                         val = val[:-1]
                                         col += 1
                             temp_parameter += val + " "
-                            print("temp_parameter: " + temp_parameter)
                         elif col == 4:
-                            print("added")
                             parameter.append(temp_parameter)
                             col += 1
-                        else:
-                            print('---------')
 
     if function_name == "strace_table":
         df = pd.DataFrame({ header[0]: time,
