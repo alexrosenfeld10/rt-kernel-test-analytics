@@ -1,9 +1,10 @@
 '''
-ftrace_df.py
+strace_df.py
 
 Procedure
-1. Cleans the log file created by bash script ftrace
+1. Cleans the log file created by bash script strace
 2. Creates a dataframe with the following column names and datatypes:
+    for strace_graph files:
     * columan name:             Data type
     --------------------------------------
     * time                      float
@@ -12,11 +13,20 @@ Procedure
     * calls                     int
     * errors                    int
     * syscall                   String
+
+    for strace_timestamp files:
+    * columan name:             Data type
+    --------------------------------------
+    * process_time              float
+    * function_name             String
+    * count                     int
+    * total time                float
+
 3. Create output csv file based on the input filename
 
 usage: strace_df.py [-f [filenames]
-example: python strace_df.py -f strace_table.txt
-example output: strace_table.csv
+example: python strace_df.py -f strace_table.txt strace_timestamp
+example output: strace_table.csv strace_timestamp.csv
 '''
 import argparse
 import pandas as pd
@@ -49,17 +59,30 @@ for filename in list_filenames:
     errors = []
     syscall = []
 
+    process_time = []
+    function_name = []
+    parameter = []
+    count = []
+    total_time = []
+
+    meta_data = {}
+    update_cols = {}
+
     function_name = ""
     output_filename = filename[:-4] + ".csv"
 
     # read filename line by line
     with open(filename) as fp:
         for line_num, l in enumerate(fp):
-            line = l.split()
-            if line[0] == '%':
-                function_name = "strace_table"
+            if line_num == 0:
+                line = l.split()
+                if line[0] == '%':
+                    function_name = "strace_table"
+                else:
+                    function_name = "strace_timestamp"
             if function_name == "strace_table":
                 if line_num >= 2:
+                    line = l.split()
                     if line[0] == "------":
                         break
                     if len(line) == 5:
@@ -90,6 +113,11 @@ for filename in list_filenames:
                                 errors.append(val)
                             elif i == 5:
                                 syscall.append(val)
+            if function_name == "strace_timestamp":
+                if line_num == 0:
+                    line = l.split()
+                    print(line)
+    if function_name == "strace_table":
         df = pd.DataFrame({ header[0]: time,
                             header[1]: seconds,
                             header[2]: usecs_call,
@@ -99,3 +127,5 @@ for filename in list_filenames:
 
         df.to_csv(output_filename, sep=',')
         print("created " + output_filename)
+    else:
+        print("strace_timestamp")

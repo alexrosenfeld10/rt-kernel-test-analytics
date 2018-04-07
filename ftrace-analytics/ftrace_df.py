@@ -18,8 +18,8 @@ Procedure
     * child-process:            String
 3. Create output csv file based on the input filename
 
-usage: ftrace_df.py [-f [filenames] [-l [task-pid names to filter]]
-example: python ftrace_df.py -f out_pi_stress_0.txt -l ftrace.sh-3764
+usage: ftrace_df.py [-f [filenames] [-l [task-pid names to filter in]]
+example: python ftrace_df.py -f out_pi_stress_0.txt -l pi_stress
 example output: out_pi_stress_0.csv
 '''
 import argparse
@@ -85,7 +85,7 @@ for filename in list_filenames:
                     for c, val in enumerate(line):
                         # storing task_pid col
                         if c == 0:
-                            if val in list_filter:
+                            if val[:9] not in list_filter:
                                 break
                             task_pid.append(val)
                         # storing cpu# col
