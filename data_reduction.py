@@ -6,9 +6,8 @@ Procedure
 2. Creates a dataframe with the column names and datatypes specific to log type
 3. Create output csv file based on the input filename
 
-usage: data_reduction.py [-f [filenames] [-l [task-pid names to filter in]]
-example: python ftrace_df.py -f out_pi_stress_0.txt -l pi_stress
-example output: out_pi_stress_0.csv
+example: python data_reduction.py -i rt/logfile -s pi_stress -o rt/python-output/
+example: python data_reduction.py -i non-rt/logfile -s pi_stress -o non-rt/python-output/
 '''
 import argparse
 import pandas as pd
@@ -277,6 +276,8 @@ def StraceTable(filename):
 '''
 StraceTimestamp - read log file, filter process id, and create dataframe
 
+TODO: fix timestampe pid issue in strace bash script
+
 @input:     String      filename    - name of log file
 @output:    DataFrame   df          - created dataframe
 '''
@@ -286,10 +287,10 @@ def StraceTimestamp(filename):
     process_name = []
     parameter = []
 
-    header = ["pid",
-               "process_time",
-               "process_name",
-               "parameter"]
+    header = ["process_time",
+              "process_name",
+              "parameter"]
+
     with open(filename) as fp:
         for line_num, l in enumerate(fp):
                 line = l.split()
@@ -333,45 +334,7 @@ def StraceTimestamp(filename):
                             parameter.append(temp_parameter)
                             col += 1
                     # end of for loop
-                if len(line) == 5:
-                    for i, val in enumerate(line):
-                        if col == 0:
-                            pid.append(val)
-                        if col == 1:
-                            process_time.append(val)
-                            col += 1
-                        elif col == 2:
-                            if temp_parameter == "<...futex":
-                                process_name.append("futex")
-                                parameter.append("resumed")
-                                col += 3
-                            if temp_parameter == "<...clock_nanosleep":
-                                process_name.append("clock_nanosleep")
-                                parameter.append("resumed")
-                                col += 3
-                            for index, c in enumerate(val):
-                                if c != '(' and c != ')':
-                                    temp_parameter += c
-                                if c == '(':
-                                    process_name.append(val[:index])
-                                    temp_parameter = temp_parameter[index:]
-                                    col += 1
-                                if c == ')':
-                                    col += 1
-                            # end of for loop
-                        elif col == 3:
-                            if i == len(line) - 1:
-                                temp_parameter += val + " "
-                                parameter.append(temp_parameter)
-                            else:
-                                for index, c in enumerate(val):
-                                    if c == ')':
-                                        val = val[:-1]
-                                        col += 1
-                            temp_parameter += val + " "
-                        elif col == 4:
-                            parameter.append(temp_parameter)
-                            col += 1
+
                     # end of for loop
         # end of for loop
         fp.close()
