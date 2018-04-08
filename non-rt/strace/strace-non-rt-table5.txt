@@ -1,0 +1,38 @@
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 41.89    2.467455      352494         7         1 futex
+ 29.18    1.718750      429688         4           gettimeofday
+ 28.88    1.701172      850586         2           clock_nanosleep
+  0.03    0.001681        1681         1           execve
+  0.01    0.000562          47        12           read
+  0.01    0.000516          32        16           mmap2
+  0.00    0.000291          11        27           write
+  0.00    0.000186          31         6           open
+  0.00    0.000165          17        10           mprotect
+  0.00    0.000000           0         6           close
+  0.00    0.000000           0         6           lseek
+  0.00    0.000000           0         5         5 access
+  0.00    0.000000           0         3           brk
+  0.00    0.000000           0         2           munmap
+  0.00    0.000000           0         3           clone
+  0.00    0.000000           0         1           uname
+  0.00    0.000000           0         1           _llseek
+  0.00    0.000000           0         4           sched_setscheduler
+  0.00    0.000000           0         6           sched_get_priority_max
+  0.00    0.000000           0         7           sched_get_priority_min
+  0.00    0.000000           0         2           rt_sigaction
+  0.00    0.000000           0         2           rt_sigprocmask
+  0.00    0.000000           0         1           getrlimit
+  0.00    0.000000           0         6           fstat64
+  0.00    0.000000           0         3           sched_setaffinity
+  0.00    0.000000           0         1           sched_getaffinity
+  0.00    0.000000           0         1           set_tid_address
+  0.00    0.000000           0         1           set_robust_list
+------ ----------- ----------- --------- --------- ----------------
+100.00    5.890778                   146         6 total
+System call usage summary for 32 bit mode:
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+   nan    0.000000           0         1           set_tls
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000000                     1           total
