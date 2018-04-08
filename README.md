@@ -1,46 +1,24 @@
 # PREEMPT-RT-LINUX
 
+### Adding log files
+Please consider if you're kernel is running real-time or non-real-time and push into the respected folder called logfiles
 
-### Ftrace Analytics
+### Creating csv files
+After inserting log files into the respected logfiles folder, please run this command:
 
-##### Ftrace function
-To data reduce ftrace function log files run this command:
+##### for rt
+`python data_reduction.py -i rt/logfiles -s pi_stress -o rt/python-output`
 
-`python ftrace_df.py -f out_pi_stress/out_pi_stress_0.txt out_pi_stress/out_pi_stress_1.txt -l pi_stress`
+##### for non-rt
+`python data_reduction.py -i non-rt/logfiles -s pi_stress -o non-rt/python-output`
 
-* The `-f` represents the log files
-* The `-l` represents the process-id that you would be filtering in
+The output csv files will be created in the folder python-output
 
-This command will output two csv files as such:
+### Future work
+* Statistical analysis on data frames created
+* Refactor into Object-Orientated Design
 
-`created out_pi_stress/out_pi_stress_0.csv`
-
-`created out_pi_stress/out_pi_stress_1.csv`
-
-##### Ftrace function graph
-ftrace_graph is not yet supported
-
----
-
-### Strace Analytics
-
-##### Strace log files
-To data reduce strace function log files run this command:
-
-`python strace_df.py -f strace_table.txt strace_timestamps.txt`
-`
-
-* The `-f` represents the log files
-
-
-This commnd will output two csv files as such:
-
-`created strace_table.csv`
-
-`created strace_timestamps.csv`
-
-Side note: Not every function call in strace_timestamps log files and may throw an error. This is indicated as follows:
-
-`error... could not create csv`
-
-If this occurs, please notify using github issues.
+### Possible issues
+If these issues arise, please notify in github issues or on discord.
+* Our strace output file is missing process id
+* The timestamp log file may contain errors that the data_reduction.py does not recognize
