@@ -1,5 +1,5 @@
 '''
-ftrace_df.py
+data_reduction.py
 
 Procedure
 1. Cleans the log file created by bash script ftrace and strace
