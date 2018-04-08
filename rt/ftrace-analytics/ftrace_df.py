@@ -24,38 +24,60 @@ example output: out_pi_stress_0.csv
 '''
 import argparse
 import pandas as pd
+import os
+import errno, sys
+import glob
 
-# column names for data frame
-header = ['task-pid',
-          'cpu#',
-          'irqs-off',
-          'need-resched',
-          'need-resched_lazy',
-          'hardirq-softirq',
-          'preempt-depth',
-          'timestamp',
-          'child-process',
-          'parent-process']
+'''
+parser
+'''
+def Parser():
+    # command line parser
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", action='store', dest='filenames',
+                        nargs="+", help="Filename of input log file")
+    parser.add_argument("-f", action='store', dest='list_filter',
+                        nargs='+', help="Filter wanted tasks-pid")
+    parser.add_argument("-o", action='store', dest='output_folder',
+                        help="Folder to create csv")
+    args = parser.parse_args()
+    if args.list_filenames == None:
+        sys.exit(errno.EACCES)
+    else:
+        list_filenames = args.filenames
+    if args.list_filter == None:
+        sys.exit(errno.EACCES)
+    else:
+        list_filter = args.list_filter
+    if args.output_fodler == None:
+        output_folder = args.output_folder
+    return list_filenames, list_filter, output_folder
 
-# list of files to read
-list_filenames = []
+'''
+path determiner
+'''
+def PathFinder(df, input_filename, output_folder):
+    fileDir = os.path.dirname(os.path.realpath('__file__'))
+    output_filename = filename[:-4] + ".csv"
 
-# list of task names to filter
-list_filter = []
+    change_path = filename.split('/')
+    print(change_path[-1])
 
-# command line parser
-parser = argparse.ArgumentParser()
-parser.add_argument("-f", action='store', dest='filename',
-                    nargs="+", help="Filename of input log file")
-parser.add_argument("-l", action='store', dest='list_filter',
-                    nargs='+', help="Filter un-wanted tasks-pid")
-args = parser.parse_args()
-list_filenames = args.filename
-if args.list_filter != None:
-    list_filter = args.list_filter
+    # determine output_path
+    input_path = fileDir + "/" + filename
+    print("input_path: " + input_path)
 
-# read every file
-for filename in list_filenames:
+    output_path = os.path.join(input_path, '../../csv/output.csv')
+    output_path = os.path.abspath(os.path.realpath(output_path))
+    print("output_path: " + output_path)
+
+    return output_path
+
+
+'''
+ftrace reader
+'''
+def FtraceReader(line_num, l, cols):
     # column values for data frame
     task_pid  = []
     cpu_num = []
@@ -68,8 +90,81 @@ for filename in list_filenames:
     child_process = []
     parent_process = []
 
+    line = l.split()
+    # cleaning ftrace line to store in proper column
+    for c, val in enumerate(line):
+        # storing task_pid col
+        if c == 0:
+            if val[:9] not in list_filter:
+                break
+            task_pid.append(val)
+        # storing cpu# col
+        elif c == 1:
+            str_len = len(val)
+            temp_str = ''
+            for i in range(0, str_len):
+                if val[i] != '[' and val[i] != ']':
+                    temp_str += val[i]
+                cpu_num.append(temp_str)
+        # storing irq_off, need_resched, need_resched_lazy,
+        # hardirq_softirq, and preempt_depth cols
+        elif c == 2:
+            str_len = len(val)
+            for i in range (0, str_len):
+                curr_char = 'null'
+                if val[i] == '.':
+                    curr_char = 'null'
+                else:
+                    curr_char = val[i]
+                if i == 0:
+                    irq_off.append(curr_char)
+                elif i == 1:
+                    need_resched.append(curr_char)
+                elif i == 2:
+                    need_resched_lazy.append(curr_char)
+                elif i == 3:
+                    hardirq_softirq.append(curr_char)
+                elif i == 4:
+                    preempt_depth.append(curr_char)
+        # storing timestamp col
+        elif c == 3:
+            str_len = len(val)
+            temp_str = ''
+            for i in range(0, str_len):
+                if val[i] != ':':
+                    temp_str += val[i]
+            timestamp_val = float(temp_str)
+            timestamp.append(timestamp_val)
+        # storing child_process col
+        elif c == 4:
+            child_process.append(val)
+        # storing parent_process col
+        elif c == 5:
+            val = val.rstrip()
+            str_len = len(val)
+            temp_str = ''
+            for i in range(0, str_len):
+                if val[i] != '<' and val [i] != '-':
+                    temp_str += val[i]
+            parent_process.append(temp_str)
+    # end for loop
+    df = pd.DataFrame({ header[0]: task_pid,
+                        header[1]: cpu_num,
+                        header[2]: irq_off,
+                        header[3]: need_resched,
+                        header[4]: need_resched_lazy,
+                        header[5]: hardirq_softirq,
+                        header[6]: preempt_depth,
+                        header[7]: timestamp,
+                        header[8]: child_process,
+                        header[9]: parent_process})
+    return df
+'''
+file reader
+'''
+def FileReader(filename):
+    # determine the name of the output file
     function_name = ""
-    output_filename = filename[:-4] + ".csv"
 
     # read filename line by line
     with open(filename) as fp:
@@ -80,80 +175,39 @@ for filename in list_filenames:
                 function_name = line[2]
             if function_name == "function":
                 if line_num >= 13:
-                    line = l.split()
-                    # cleaning ftrace line to store in proper column
-                    for c, val in enumerate(line):
-                        # storing task_pid col
-                        if c == 0:
-                            if val[:9] not in list_filter:
-                                break
-                            task_pid.append(val)
-                        # storing cpu# col
-                        elif c == 1:
-                            str_len = len(val)
-                            temp_str = ''
-                            for i in range(0, str_len):
-                                if val[i] != '[' and val[i] != ']':
-                                    temp_str += val[i]
-                            cpu_num.append(temp_str)
-                        # storing irq_off, need_resched, need_resched_lazy,
-                        # hardirq_softirq, and preempt_depth cols
-                        elif c == 2:
-                            str_len = len(val)
-                            for i in range (0, str_len):
-                                curr_char = 'null'
-                                if val[i] == '.':
-                                    curr_char = 'null'
-                                else:
-                                    curr_char = val[i]
-                                if i == 0:
-                                    irq_off.append(curr_char)
-                                elif i == 1:
-                                    need_resched.append(curr_char)
-                                elif i == 2:
-                                    need_resched_lazy.append(curr_char)
-                                elif i == 3:
-                                    hardirq_softirq.append(curr_char)
-                                elif i == 4:
-                                    preempt_depth.append(curr_char)
-                        # storing timestamp col
-                        elif c == 3:
-                            str_len = len(val)
-                            temp_str = ''
-                            for i in range(0, str_len):
-                                if val[i] != ':':
-                                    temp_str += val[i]
-                            timestamp_val = float(temp_str)
-                            timestamp.append(timestamp_val)
-                        # storing child_process col
-                        elif c == 4:
-                            child_process.append(val)
-                        # storing parent_process col
-                        elif c == 5:
-                            val = val.rstrip()
-                            str_len = len(val)
-                            temp_str = ''
-                            for i in range(0, str_len):
-                                if val[i] != '<' and val [i] != '-':
-                                    temp_str += val[i]
-                            parent_process.append(temp_str)
+                    df = FtraceReader(l)
             if function_name == "function_graph":
                 print("currently do not have a dataframe for ftrace-function_graph")
                 break
 
+def main():
+    # column names for data frame
+    header = ['task-pid',
+              'cpu#',
+              'irqs-off',
+              'need-resched',
+              'need-resched_lazy',
+              'hardirq-softirq',
+              'preempt-depth',
+              'timestamp',
+              'child-process',
+              'parent-process']
+    # list of files to read
+    list_filenames = []
 
+    # list of task names to filter
+    list_filter = []
 
-    if function_name == "function":
-        df = pd.DataFrame({ header[0]: task_pid,
-                            header[1]: cpu_num,
-                            header[2]: irq_off,
-                            header[3]: need_resched,
-                            header[4]: need_resched_lazy,
-                            header[5]: hardirq_softirq,
-                            header[6]: preempt_depth,
-                            header[7]: timestamp,
-                            header[8]: child_process,
-                            header[9]: parent_process})
+    # name of output folder
+    output_folder = ""
 
-        df.to_csv(output_filename, sep=',')
-        print("created " + output_filename)
+    # list of data frames
+    print("Hello World!")
+    list_filenames, list_filter, output_folder = Parser()
+
+    # read every file
+    for filename in list_filenames:
+        df = FileReader(filename)
+
+if __name__ == "__main__":
+    main()

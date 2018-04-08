@@ -57,6 +57,7 @@ list_filenames = args.filename
 # read every file
 for filename in list_filenames:
     # column values for data frame
+    print(filename)
     time = []
     seconds = []
     usecs_call = []
@@ -74,13 +75,16 @@ for filename in list_filenames:
 
     # read filename line by line
     with open(filename) as fp:
+        print('here')
         for line_num, l in enumerate(fp):
+            print(line_num)
             if line_num == 0:
                 line = l.split()
                 if line[0] == '%':
                     function_name = "strace_table"
                 else:
                     function_name = "strace_timestamp"
+                print(function_name)
             if function_name == "strace_table":
                 if line_num >= 2:
                     line = l.split()
