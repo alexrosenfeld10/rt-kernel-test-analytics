@@ -1,0 +1,37 @@
+
+ -----------------------------------------------------------------------------------------------------------------
+  Task                  |   Runtime ms  | Switches | Average delay ms | Maximum delay ms | Maximum delay at       |
+ -----------------------------------------------------------------------------------------------------------------
+  perf:32202            |      0.000 ms |        4 | avg:    3.884 ms | max:   14.959 ms | max at:  76472.792177 s
+  sudo:32203            |      0.000 ms |       15 | avg:    2.787 ms | max:    6.878 ms | max at:  76472.840161 s
+  rs:main Q:Reg:626     |      0.000 ms |       19 | avg:    2.003 ms | max:    5.477 ms | max at:  76522.099194 s
+  wicd:984              |      0.000 ms |      217 | avg:    1.899 ms | max:   15.428 ms | max at:  76526.101252 s
+  cron:(2)              |      0.000 ms |       23 | avg:    1.454 ms | max:    6.583 ms | max at:  76489.531829 s
+  systemd-journal:118   |      0.000 ms |       65 | avg:    1.288 ms | max:    4.071 ms | max at:  76526.113808 s
+  sh:32212              |      0.000 ms |       10 | avg:    1.152 ms | max:    5.031 ms | max at:  76489.547826 s
+  ifconfig:(12)         |      0.000 ms |      162 | avg:    1.041 ms | max:    3.563 ms | max at:  76491.075146 s
+  ps:32216              |      0.000 ms |       46 | avg:    1.025 ms | max:    2.990 ms | max at:  76489.742750 s
+  wicd-monitor:990      |      0.000 ms |      121 | avg:    1.025 ms | max:    9.540 ms | max at:  76526.096284 s
+  sshd:(17)             |      0.000 ms |     3867 | avg:    0.739 ms | max:   27.776 ms | max at:  76522.103363 s
+  .koworker:(6)         |      0.000 ms |    63479 | avg:    0.159 ms | max:   16.343 ms | max at:  76472.856504 s
+  systemd:1             |      0.000 ms |        4 | avg:    0.146 ms | max:    0.349 ms | max at:  76526.744098 s
+  avahi-daemon:500      |      0.000 ms |       24 | avg:    0.130 ms | max:    1.027 ms | max at:  76506.754590 s
+  dbus-daemon:518       |      0.000 ms |       90 | avg:    0.080 ms | max:    1.187 ms | max at:  76506.013923 s
+  kworker/0:1H:96       |      0.000 ms |        3 | avg:    0.079 ms | max:    0.198 ms | max at:  76498.716934 s
+  kworker/0:1:32113     |      0.000 ms |       16 | avg:    0.077 ms | max:    0.235 ms | max at:  76528.448965 s
+  kworker/u2:1:27770    |      0.000 ms |      340 | avg:    0.037 ms | max:    0.273 ms | max at:  76496.938991 s
+  mmcqd/1:89            |      0.000 ms |       10 | avg:    0.029 ms | max:    0.052 ms | max at:  76530.244384 s
+  ksoftirqd/0:7         |      0.000 ms |       86 | avg:    0.029 ms | max:    0.048 ms | max at:  76529.529791 s
+  cyclictest:(2)        |      0.000 ms |    11916 | avg:    0.027 ms | max:    5.840 ms | max at:  76523.982734 s
+  kworker/u2:0:32178    |      0.000 ms |        2 | avg:    0.024 ms | max:    0.048 ms | max at:  76505.575779 s
+  irq/31-44e0b000:90    |      0.000 ms |        2 | avg:    0.014 ms | max:    0.029 ms | max at:  76475.360735 s
+  rsyslogd:627          |      0.000 ms |        1 | avg:    0.000 ms | max:    0.000 ms | max at:      0.000000 s
+  ptp0:1120             |      0.000 ms |        1 | avg:    0.000 ms | max:    0.000 ms | max at:      0.000000 s
+  kworker/0:2:25061     |      0.000 ms |        1 | avg:    0.000 ms | max:    0.000 ms | max at:      0.000000 s
+  khungtaskd:12         |      0.000 ms |        1 | avg:    0.000 ms | max:    0.000 ms | max at:      0.000000 s
+  jbd2/mmcblk1p2-:97    |      0.000 ms |        1 | avg:    0.000 ms | max:    0.000 ms | max at:      0.000000 s
+  apache2:808           |      0.000 ms |        1 | avg:    0.000 ms | max:    0.000 ms | max at:      0.000000 s
+ -----------------------------------------------------------------------------------------------------------------
+  TOTAL:                |      0.000 ms |    80527 |
+ ---------------------------------------------------
+

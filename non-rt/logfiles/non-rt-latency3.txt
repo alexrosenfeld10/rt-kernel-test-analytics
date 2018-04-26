@@ -1,0 +1,39 @@
+
+ -----------------------------------------------------------------------------------------------------------------
+  Task                  |   Runtime ms  | Switches | Average delay ms | Maximum delay ms | Maximum delay at       |
+ -----------------------------------------------------------------------------------------------------------------
+  sudo:32267            |      0.000 ms |        6 | avg:    2.974 ms | max:    4.102 ms | max at:  76562.624766 s
+  perf:32266            |      0.000 ms |        5 | avg:    2.466 ms | max:   12.153 ms | max at:  76562.574765 s
+  wicd:984              |      0.000 ms |      226 | avg:    1.800 ms | max:    6.849 ms | max at:  76591.094139 s
+  sh:32285              |      0.000 ms |        9 | avg:    1.467 ms | max:    7.006 ms | max at:  76609.780228 s
+  cron:(2)              |      0.000 ms |       25 | avg:    1.188 ms | max:    5.770 ms | max at:  76609.801625 s
+  ps:32289              |      0.000 ms |       40 | avg:    1.118 ms | max:    3.272 ms | max at:  76610.032644 s
+  ifconfig:(12)         |      0.000 ms |      153 | avg:    1.109 ms | max:    4.878 ms | max at:  76601.048275 s
+  rs:main Q:Reg:626     |      0.000 ms |       14 | avg:    1.047 ms | max:    3.848 ms | max at:  76598.299192 s
+  wicd-monitor:990      |      0.000 ms |      135 | avg:    0.958 ms | max:    5.423 ms | max at:  76591.025466 s
+  systemd-journal:118   |      0.000 ms |       19 | avg:    0.761 ms | max:    2.061 ms | max at:  76579.354419 s
+  sshd:(9)              |      0.000 ms |     2324 | avg:    0.371 ms | max:   10.373 ms | max at:  76592.160416 s
+  .koworker:(6)         |      0.000 ms |    64431 | avg:    0.134 ms | max:   16.284 ms | max at:  76562.636519 s
+  avahi-daemon:500      |      0.000 ms |       19 | avg:    0.090 ms | max:    0.877 ms | max at:  76594.381232 s
+  kworker/0:1:32113     |      0.000 ms |       20 | avg:    0.082 ms | max:    0.247 ms | max at:  76564.416609 s
+  kworker/0:1H:96       |      0.000 ms |        2 | avg:    0.081 ms | max:    0.162 ms | max at:  76567.023520 s
+  dbus-daemon:518       |      0.000 ms |       83 | avg:    0.075 ms | max:    1.348 ms | max at:  76576.009895 s
+  kthreadd:(2)          |      0.000 ms |       14 | avg:    0.047 ms | max:    0.085 ms | max at:  76612.060444 s
+  mmcqd/1:89            |      0.000 ms |       10 | avg:    0.040 ms | max:    0.109 ms | max at:  76596.545195 s
+  kworker/u2:1:27770    |      0.000 ms |      342 | avg:    0.035 ms | max:    0.303 ms | max at:  76590.182665 s
+  ksoftirqd/0:7         |      0.000 ms |      123 | avg:    0.029 ms | max:    0.050 ms | max at:  76621.054438 s
+  ptp0:1120             |      0.000 ms |        2 | avg:    0.028 ms | max:    0.056 ms | max at:  76587.488405 s
+  irq/31-44e0b000:90    |      0.000 ms |        4 | avg:    0.022 ms | max:    0.036 ms | max at:  76618.720385 s
+  rsyslogd:627          |      0.000 ms |        2 | avg:    0.021 ms | max:    0.042 ms | max at:  76562.624302 s
+  cyclictest:(2)        |      0.000 ms |    12101 | avg:    0.020 ms | max:    7.868 ms | max at:  76562.644168 s
+  jbd2/mmcblk1p2-:97    |      0.000 ms |        3 | avg:    0.019 ms | max:    0.029 ms | max at:  76577.976388 s
+  systemd:1             |      0.000 ms |        1 | avg:    0.000 ms | max:    0.000 ms | max at:      0.000000 s
+  kworker/u2:0:32178    |      0.000 ms |        1 | avg:    0.000 ms | max:    0.000 ms | max at:      0.000000 s
+  kworker/dying:31947   |      0.000 ms |        1 | avg:    0.000 ms | max:    0.000 ms | max at:      0.000000 s
+  kworker/0:2:25061     |      0.000 ms |        1 | avg:    0.000 ms | max:    0.000 ms | max at:      0.000000 s
+  khungtaskd:12         |      0.000 ms |        1 | avg:    0.000 ms | max:    0.000 ms | max at:      0.000000 s
+  apache2:808           |      0.000 ms |        1 | avg:    0.000 ms | max:    0.000 ms | max at:      0.000000 s
+ -----------------------------------------------------------------------------------------------------------------
+  TOTAL:                |      0.000 ms |    80118 |
+ ---------------------------------------------------
+
