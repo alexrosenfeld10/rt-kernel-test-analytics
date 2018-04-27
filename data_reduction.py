@@ -385,7 +385,7 @@ def PerfLatency(filename):
                             curr_line = curr_line[:-2]
                             average_delay.append(curr_line)
                         if line_count == 4:
-                            curr_line = curr_line[3:]
+                            curr_line = curr_line[4:]
                             curr_line = curr_line[:-2]
                             max_ms.append(curr_line)
                         if line_count == 5:
