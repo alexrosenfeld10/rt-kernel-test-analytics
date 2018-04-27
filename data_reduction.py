@@ -430,11 +430,11 @@ def PerfLog(filename):
         'Overhead',
         'Preempted process',
         'Preempted process id',
-        'Preempted unknown',
+        'Preempted process priority',
         'Scheduled status',
         'Preempting process',
         'Preempting process id',
-        'Preempting unknown'
+        'Preempting process priority'
     ]
 
     with open(filename) as fp:

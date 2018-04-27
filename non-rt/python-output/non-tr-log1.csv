@@ -1,4 +1,4 @@
-,Overhead,Preempted process,Preempted process id,Preempted unknown,Preempting process,Preempting process id,Preempting unknown,Scheduled status
+,Overhead,Preempted process,Preempted process id,Preempted process priority,Preempting process,Preempting process id,Preempting process priority,Scheduled status
 0,12.56%,cyclictest,32166,120,kworker/u2,1,120,R
 1,12.01%,.koworker,1019,120,cyclictest,32167,0,R
 2,11.96%,.koworker,1016,120,cyclictest,32167,0,R
