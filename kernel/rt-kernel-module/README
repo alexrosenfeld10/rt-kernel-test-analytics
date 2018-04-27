@@ -1,6 +1,9 @@
 Author: Leo Tomatsu
 Email: leotomatsu@gmail.com
 
+Overview
+To view printk statements use dmesg tool.
+
 TODO
 - adjust location to add kernel module in Makefile
 - link function in load_elf_binary with kernel module
