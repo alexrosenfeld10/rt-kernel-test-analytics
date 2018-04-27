@@ -381,7 +381,7 @@ def PerfLatency(filename):
                         if line_count == 2:
                             switches.append(curr_line)
                         if line_count == 3:
-                            curr_line = curr_line[3:]
+                            curr_line = curr_line[4:]
                             curr_line = curr_line[:-2]
                             average_delay.append(curr_line)
                         if line_count == 4:
