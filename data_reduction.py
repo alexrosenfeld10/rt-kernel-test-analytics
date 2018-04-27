@@ -334,8 +334,6 @@ def StraceTimestamp(filename):
                             parameter.append(temp_parameter)
                             col += 1
                     # end of for loop
-
-                    # end of for loop
         # end of for loop
         fp.close()
     # end of fp
@@ -349,6 +347,92 @@ def StraceTimestamp(filename):
     else:
         print("error")
         sys.exit(0)
+
+'''
+PerfLatency - read log file and create csv
+
+@input:     String      filename    - name of log file
+@output:    DataFrame   df          - created dataframe
+'''
+def PerfLatency(filename):
+    task = []
+    runtime_ms = []
+    switches = []
+    average_delay = []
+    max_ms = []
+    max_at = []
+
+    header = ['Task', 'Runtime ms', 'Switches', 'Average delay ms',
+              'Maximum delay ms', 'Maximum delay at']
+    with open(filename) as fp:
+        for line_num, l in enumerate(fp):
+            if line_num > 4:
+                line = l.split('| ')
+                if len(line) > 4:
+                    for line_count, line_elem in enumerate(line):
+                        curr_line = line_elem.replace(" ", "")
+                        curr_line = curr_line.replace('|', '')
+                        curr_line = curr_line.strip('\n')
+                        if line_count == 0:
+                            task.append(curr_line)
+                        if line_count == 1:
+                            curr_line = curr_line[:-2]
+                            runtime_ms.append(curr_line)
+                        if line_count == 2:
+                            switches.append(curr_line)
+                        if line_count == 3:
+                            curr_line = curr_line[3:]
+                            curr_line = curr_line[:-2]
+                            average_delay.append(curr_line)
+                        if line_count == 4:
+                            curr_line = curr_line[3:]
+                            curr_line = curr_line[:-2]
+                            max_ms.append(curr_line)
+                        if line_count == 5:
+                            curr_line = curr_line[6:]
+                            curr_line = curr_line[:-1]
+                            max_at.append(curr_line)
+                    # end of for loop
+        # end of for loop
+        fp.close()
+    # end of for loop
+    if len(task) == len(runtime_ms) == len(switches) == len(average_delay) == len(max_ms) == len(max_at):
+        df = pd.DataFrame({
+            header[0]: task,
+            header[1]: runtime_ms,
+            header[2]: switches,
+            header[3]: average_delay,
+            header[4]: max_ms,
+            header[5]: max_at
+            })
+        return df
+    else:
+        print("error")
+        sys.exit(0)
+
+'''
+PerfLog - read log file and create csv
+
+@input:     String      filename    - name of log file
+@output:    DataFrame   df          - created dataframe
+'''
+def PerfLog(filename):
+    overhead = []
+    parent_process = []
+    child_process = []
+
+    header = [
+        'Overhead',
+        'Parent Process',
+        'Child Process'
+    ]
+
+    with open(filename) as fp:
+        for line_num, l in enumerate(fp):
+            if line_num > 10:
+                line = l.split('==>')
+                line = line.split()
+                # print(line)
 
 
 '''
@@ -365,18 +449,33 @@ def LogType(filename):
             # strace_table identifier
             if line_num == 0:
                 line = l.split()
-                if line[0] == '%':
-                    function_name = "strace_table"
+                if (len(line) != 0):
+                    if line[0] == '%':
+                        function_name = "strace_table"
+                        continue
+                    elif line[0] == '#':
+                        function_name = "perf_log"
+                        continue
+                    elif line[0] == '0.000000':
+                        function_name = "strace_timestamp"
+                        continue
+            if line_num == 1:
+                line = l.split()
+                if len(line) != 0:
+                    if line[0] == '-----------------------------------------------------------------------------------------------------------------':
+                        function_name = "perf_latency"
+                        continue
             # ftrace identifier
             if line_num == 3:
                 line = l.split()
-                temp = line[2]
-                if temp == 'function':
-                    function_name = "ftrace_function"
-                elif temp == 'function_graph':
-                    function_name = "ftrace_graph"
-                if function_name == '':
-                    function_name = "strace_timestamp"
+                if (len(line) > 2):
+                    temp = line[2]
+                    if temp == 'function':
+                        function_name = "ftrace_function"
+                        continue
+                    elif temp == 'function_graph':
+                        function_name = "ftrace_graph"
+                        continue
         # end of for loop
         fp.close()
     #end of fp
@@ -409,6 +508,10 @@ def main():
             df = StraceTable(filename)
         elif logtype == 'strace_timestamp':
             df = StraceTimestamp(filename)
+        # elif logtype == 'perf_log':
+            # PerfLog(filename)
+        elif logtype == 'perf_latency':
+            df = PerfLatency(filename)
 
         output_filename, output_path = PathFinder(filename, output_folder)
         df.to_csv(output_path)
