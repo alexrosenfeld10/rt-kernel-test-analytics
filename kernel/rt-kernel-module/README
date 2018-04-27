@@ -1,13 +1,24 @@
 Author: Leo Tomatsu
 Email: leotomatsu@gmail.com
 
+Note
+This is best guess.
+
+Commandline Instructions
+1. make			# create executable kernel module
+2. make load		# insmod kernel module
+3. dmesg		# debug by checking printk statements
+4. make unload		# rmmod kernel module 
+5. dmesg		# debug by checking printk statements
+6. dmesg -c		# clear dmesg statements
+
 Overview
 To view printk statements use dmesg tool.
 
 TODO
 - adjust location to add kernel module in Makefile
 - link function in load_elf_binary with kernel module
-- add team members name who contributed writing code
+- figure out additional functionalities
 
 Reference
 - http://wwww.cs.bu.edu/fac/richwest/

@@ -1,15 +1,15 @@
 # TODO update file path for rt-kernel
-obj-m += rt_kernel_module.o
+obj-m += elf_hook_module.o
 
 build_module:
 	make -C /lib/modules/`uname -r`/build SUBDIRS=$(PWD) modules
 
 
 load: build_module
-	insmod rt_kernel_module.ko	
+	insmod elf_hook_module.ko	
 
 clean:
 	make -C /lib/modules/`uname -r`/build SUBDIRS=$(PWD) clean
 
 unload: clean
-	rmmod rt_kernel_module.ko
+	rmmod elf_hook_module.ko
