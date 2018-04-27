@@ -603,6 +603,7 @@ def main():
 
     # open folder to read file
     for filename in glob.glob(os.path.join(input_folder, '*.txt')):
+        print("read " + filename)
         logtype = LogType(filename)
         if logtype == 'ftrace_function':
             df = FtraceFunction(filename, search_pid)
