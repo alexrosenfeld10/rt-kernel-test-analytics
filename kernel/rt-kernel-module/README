@@ -1,0 +1,14 @@
+Author: Leo Tomatsu
+Email: leotomatsu@gmail.com
+
+TODO
+- adjust location to add kernel module in Makefile
+- link function in load_elf_binary with kernel module
+- add team members name who contributed writing code
+
+Reference
+- http://wwww.cs.bu.edu/fac/richwest/
+- http://tldp.org/
+- http://lxr.free-electrons.com/
+- https://wiki.osdev.org/
+- http://www.win.tue.nl/
