@@ -39,7 +39,7 @@ void handle_elf_hook(struct elfhdr elf_ex, struct elf_shdr *elf_spnt) {
 	if (section_name != NULL)
 		printk(KERN_INFO " <rt_module> Read section %s.\n", section_name); 
 	else
-		printk(KERN_INFO " <rt_module> read_elf_hook error.\n");
+		printk(KERN_INFO " <rt_module> Error handle_elf_hook.\n");
 	/* add additional functionality */
 }
 
