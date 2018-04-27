@@ -418,21 +418,126 @@ PerfLog - read log file and create csv
 '''
 def PerfLog(filename):
     overhead = []
-    parent_process = []
-    child_process = []
+    preempted_process = []
+    preempted_id = []
+    preempted_unknown = []
+    scheduled_status = []
+    preempting_process = []
+    preempting_id = []
+    preempting_unknown = []
 
     header = [
         'Overhead',
-        'Parent Process',
-        'Child Process'
+        'Preempted process',
+        'Preempted process id',
+        'Preempted unknown',
+        'Scheduled status',
+        'Preempting process',
+        'Preempting process id',
+        'Preempting unknown'
     ]
 
     with open(filename) as fp:
         for line_num, l in enumerate(fp):
-            if line_num > 10:
-                line = l.split('==>')
-                line = line.split()
-                # print(line)
+            if line_num > 10 and len(l) > 3:
+                line = l.split()
+                if line[0] == '#':
+                    continue
+                if len(line) == 7:
+                    for val_count, val in enumerate(line):
+                        if val_count == 0:
+                            overhead.append(val)
+                        elif val_count == 1:
+                            elems = val.split(':')
+                            preempted_process.append(elems[0])
+                            preempted_id.append(elems[1])
+                        elif val_count == 2:
+                            curr_val = val.replace('[', '')
+                            curr_val = curr_val.replace(']', '')
+                            preempted_unknown.append(curr_val)
+                        elif val_count == 3:
+                            scheduled_status.append(val)
+                        elif val_count == 5:
+                            elems = val.split(':')
+                            preempting_process.append(elems[0])
+                            preempting_id.append(elems[1])
+                        elif val_count == 6:
+                            curr_val = val.replace('[', '')
+                            curr_val = curr_val.replace(']', '')
+                            preempting_unknown.append(curr_val)
+                elif len(line) == 8:
+                    process_name = ''
+                    for val_count, val in enumerate(line):
+                        later_flag = False
+                        if val_count == 0:
+                            overhead.append(val)
+                        elif val_count == 1:
+                            if val == 'rs:main':
+                                process_name += val
+                            else:
+                                elems = val.split(':')
+                                preempted_process.append(elems[0])
+                                preempted_id.append(elems[1])
+                        elif val_count == 2:
+                            if process_name != '':
+                                elems = val.split(':')
+                                process_name += elems[0] + ':'
+                                process_name += elems[1]
+                                preempted_process.append(process_name)
+                                preempted_id.append(elems[2])
+                            else:
+                                curr_val = val.replace('[', '')
+                                curr_val = curr_val.replace(']', '')
+                                preempted_unknown.append(curr_val)
+                        elif val_count == 3:
+                            if process_name != '':
+                                curr_val = val.replace('[', '')
+                                curr_val = curr_val.replace(']', '')
+                                preempted_unknown.append(curr_val)
+                            else:
+                                scheduled_status.append(val)
+                        elif val_count == 4:
+                            if process_name != '':
+                                scheduled_status.append(val)
+                        elif val_count == 5:
+                            if process_name == '':
+                                if val == 'rs:main':
+                                    process_name += val
+                                    later_flag = True
+                        elif val_count == 6:
+                            if later_flag:
+                                elems = val.split(':')
+                                process_name += elems[0] + ':'
+                                process_name += elems[1]
+                                preempted_process.append(process_name)
+                                preempted_id.append(elems[2])
+                            else:
+                                elems = val.split(':')
+                                preempting_process.append(elems[0])
+                                preempting_id.append(elems[1])
+                        elif val_count == 7:
+                            curr_val = val.replace('[', '')
+                            curr_val = curr_val.replace(']', '')
+                            preempting_unknown.append(curr_val)
+
+                # end of for loop
+        # end of for loop
+        fp.close()
+    if len(overhead) == len(preempted_process) == len(preempted_id) == len(preempted_unknown) == len(scheduled_status) == len(preempting_process) == len(preempting_id) == len(preempting_unknown):
+        df = pd.DataFrame({
+            header[0]: overhead,
+            header[1]: preempted_process,
+            header[2]: preempted_id,
+            header[3]: preempted_unknown,
+            header[4]: scheduled_status,
+            header[5]: preempting_process,
+            header[6]: preempting_id,
+            header[7]: preempting_unknown
+        })
+        return df
+    else:
+        print("error")
+        sys.exit(0)
 
 
 '''
@@ -508,8 +613,8 @@ def main():
             df = StraceTable(filename)
         elif logtype == 'strace_timestamp':
             df = StraceTimestamp(filename)
-        # elif logtype == 'perf_log':
-            # PerfLog(filename)
+        elif logtype == 'perf_log':
+            df = PerfLog(filename)
         elif logtype == 'perf_latency':
             df = PerfLatency(filename)
 
