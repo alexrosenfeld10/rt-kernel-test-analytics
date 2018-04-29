@@ -51,7 +51,9 @@
 #define user_siginfo_t siginfo_t
 #endif
 
-
+/*
+ * Export the elf_hook_module for external implementation
+ */
 void * (* elf_hook_module)(void * args) = NULL;
 EXPORT_SYMBOL(elf_hook_module);
 
@@ -737,7 +739,9 @@ static unsigned long randomize_stack_top(unsigned long stack_top)
 #endif
 }
 
-// Added Apr 26
+/*
+ * Some helper functions for processing the elf section headers
+ */
 static struct elf_shdr *elf_sheader(struct elfhdr *hdr) {
 	return (struct elf_shdr *)((int)hdr + hdr->e_shoff);
 }
@@ -756,8 +760,6 @@ static char *elf_lookup_string(struct elfhdr *hdr, int offset) {
 	if(strtab == NULL) return NULL;
 	return strtab + offset;
 }
-
-// End new
 
 static int load_elf_binary(struct linux_binprm *bprm)
 {
@@ -963,13 +965,16 @@ static int load_elf_binary(struct linux_binprm *bprm)
 	
 	current->mm->start_stack = bprm->p;
 
-    /* Find our special elf section and pass it to the module (if it's loaded...)*/
+    /*
+     * Find our special elf section and
+     * pass it to the module (if it's loaded...)
+     */
     // TODO ensure that the elf_hook_module doesn't get removed during for loop execution
 	if (elf_shdata && elf_hook_module != NULL) {
 	    for(i = 0, elf_spnt = elf_shdata;
 	        i < loc->elf_ex.e_shnum; i++, elf_spnt++) {
                 char * section_name = elf_lookup_string(&(loc->elf_ex), elf_spnt->sh_offset);
-                if (strcmp((const char*) section_name, "mydata") == 0) {
+                if (strcmp((const char*) section_name, "elf_hook_module_data") == 0) {
                     elf_hook_module(elf_spnt);
                 }
             }
