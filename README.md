@@ -27,6 +27,7 @@ The output of each trace function will be output to either non-rt/logfiles or rt
 ### TODO
 1. Get kernel module working with modded kernel.
 2. Possibly read data from the python-output file.
+3. Incorporate assembly code analysis using `perf annotate --stdio > perf_assembly.txt`
 
 ## Python Script
 ### Adding log files
