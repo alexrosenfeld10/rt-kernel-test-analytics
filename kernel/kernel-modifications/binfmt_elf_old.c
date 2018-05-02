@@ -512,52 +512,6 @@ out:
 	return elf_shdata;
 }
 
-/**
- * load_elf_strtbl() - load ELF string table
- * @elf_ex:   ELF header of the binary whose section headers should be loaded
- * @elf_file: the opened ELF binary file
- *
- * Loads ELF string table from the binary file elf_file, which has the ELF
- * header pointed to by elf_ex, into a newly allocated array. The caller is
- * responsible for freeing the allocated data. Returns an ERR_PTR upon failure.
- */
-static char *load_elf_strtbl(struct elfhdr *elf_ex,
-			     struct elf_shdr *shdr,
-			     struct file *elf_file)
-{
-	char *strtbl = NULL;
-	int retval, size, err = -1;
-
-	int idx = elf_ex->e_shstrndx;
-	int shsize = elf_ex->e_shentsize;
-
-	struct elf_shdr * strtbl_descr = (struct elf_shdr *)((uint32_t)shdr + shsize*idx);
-
-	/* ...and their total size. */
-	size = strtbl_descr->sh_size;
-	loff_t pos = strtbl_descr->sh_offset;
-
-	strtbl = kmalloc(size, GFP_KERNEL);
-	if (!strtbl)
-		goto out;
-
-	/* Read in the section headers */
-	retval = kernel_read(elf_file, strtbl, size, &pos);
-	if (retval != size) {
-		err = (retval < 0) ? retval : -EIO;
-		goto out;
-	}
-
-	/* Success! */
-	err = 0;
-out:
-	if (err) {
-		kfree(strtbl);
-		strtbl = NULL;
-	}
-	return strtbl;
-}
-
 #ifndef CONFIG_ARCH_BINFMT_ELF_STATE
 
 /**
@@ -785,6 +739,28 @@ static unsigned long randomize_stack_top(unsigned long stack_top)
 #endif
 }
 
+/*
+ * Some helper functions for processing the elf section headers
+ */
+static struct elf_shdr *elf_sheader(struct elfhdr *hdr) {
+	return (struct elf_shdr *)((int)hdr + hdr->e_shoff);
+}
+
+static struct elf_shdr *elf_section(struct elfhdr *hdr, int idx) {
+	return &elf_sheader(hdr)[idx];
+}
+
+static char *elf_str_table(struct elfhdr *hdr) {
+	if(hdr->e_shstrndx == SHN_UNDEF) return NULL;
+	return (char *)hdr + elf_section(hdr, hdr->e_shstrndx)->sh_offset;
+}
+ 
+static char *elf_lookup_string(struct elfhdr *hdr, int offset) {
+	char *strtab = elf_str_table(hdr);
+	if(strtab == NULL) return NULL;
+	return strtab + offset;
+}
+
 static int load_elf_binary(struct linux_binprm *bprm)
 {
 	struct file *interpreter = NULL; /* to shut gcc up */
@@ -794,7 +770,6 @@ static int load_elf_binary(struct linux_binprm *bprm)
 	unsigned long error;
 	struct elf_phdr *elf_ppnt, *elf_phdata, *interp_elf_phdata = NULL;
 	struct elf_shdr *elf_spnt, *elf_shdata = NULL;
-	char * strtbl = NULL;
 	unsigned long elf_bss, elf_brk;
 	int bss_prot = 0;
 	int retval, i;
@@ -834,8 +809,6 @@ static int load_elf_binary(struct linux_binprm *bprm)
 
 	elf_phdata = load_elf_phdrs(&loc->elf_ex, bprm->file);
 	elf_shdata = load_elf_shdrs(&loc->elf_ex, bprm->file);
-	strtbl = load_elf_strtbl(&loc->elf_ex, elf_shdata, bprm->file);
-
 	if (!elf_phdata)
 		goto out;
 
@@ -998,14 +971,10 @@ static int load_elf_binary(struct linux_binprm *bprm)
      */
     // TODO ensure that the elf_hook_module doesn't get removed during for loop execution
 	if (elf_shdata && elf_hook_module != NULL) {
-            printk("Value of elf_shdata: %d\n", elf_shdata->sh_name);
 	    for(i = 0, elf_spnt = elf_shdata;
 	        i < loc->elf_ex.e_shnum; i++, elf_spnt++) {
-                printk("Value of elf_spnt: %d\n", elf_spnt->sh_name);
-                char * section_name = strtbl + elf_spnt->sh_name;
-                printk("Value of section_name: %s\n", section_name);
-                if (strcmp((const char*) section_name, ".elf_hook_module_data") == 0) {
-                    printk("Entering the module");
+                char * section_name = elf_lookup_string(&(loc->elf_ex), elf_spnt->sh_offset);
+                if (strcmp((const char*) section_name, "elf_hook_module_data") == 0) {
                     elf_hook_module(elf_spnt);
                 }
             }
@@ -1228,8 +1197,6 @@ static int load_elf_binary(struct linux_binprm *bprm)
 
 	kfree(interp_elf_phdata);
 	kfree(elf_phdata);
-	kfree(elf_shdata);
-	kfree(strtbl);
 
 	set_binfmt(&elf_format);
 

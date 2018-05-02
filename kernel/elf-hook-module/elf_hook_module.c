@@ -32,6 +32,7 @@ static char *elf_lookup_string(struct elfhdr *hdr, int offset) {
 /***
  * Handling struct elf_shdr
  */
+/*
 void handle_elf_hook(struct elfhdr elf_ex, struct elf_shdr *elf_spnt) {
  	printk(KERN_INFO " <rt_module> Call read_elf_hook.\n");
 
@@ -40,7 +41,13 @@ void handle_elf_hook(struct elfhdr elf_ex, struct elf_shdr *elf_spnt) {
 		printk(KERN_INFO " <rt_module> Read section %s.\n", section_name); 
 	else
 		printk(KERN_INFO " <rt_module> Error handle_elf_hook.\n");
-	/* add additional functionality */
+	 add additional functionality 
+}
+*/
+
+
+void handle_elf_hook(void * args) {
+    printk(KERN_INFO "print elf_hook_module_data here ");
 }
 
 /***
