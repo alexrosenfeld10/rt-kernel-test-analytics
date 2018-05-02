@@ -1,5 +1,35 @@
 # PREEMPT-RT-LINUX
 
+## Configuration
+Please give permissions to run the bash script `chmod u+x rt_kernel_analysis.sh`.
+
+
+## Bash Script
+### Usage
+`Usage: ./rt_kernel_analysis.sh [-h (help)] [-n program name] [-t type (rt | non-rt)]`
+* h flag will echo the Usage string
+* n flag will assign the program name to run the rt-kernel analysis
+* t flag will assign the type of the kernel to be either rt or non-rt
+
+### What it will run
+The following executions will be made:
+* Error handle user input and validate if program is in rt-kernel
+* ftrace graph
+* ftrace functions
+* strace table
+* strace timestamp
+* perf context switching
+* perf cache profiling
+* python data_reduction.py
+
+The output of each trace function will be output to either non-rt/logfiles or rt/logfiles. The python script will read from those directories and store the created csv files into non-rt/python-output or rt/python-output.
+
+### TODO
+1. Get kernel module working with modded kernel.
+2. Possibly read data from the python-output file.
+3. Incorporate assembly code analysis using `perf annotate --stdio > perf_assembly.txt`
+
+## Python Script
 ### Adding log files
 Please consider if you're kernel is running real-time or non-real-time and push into the respected folder called logfiles
 
