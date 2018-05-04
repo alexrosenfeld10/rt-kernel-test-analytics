@@ -558,6 +558,47 @@ out:
 	return strtbl;
 }
 
+/**
+ * load_elf_shcontents() - load ELF section header contents
+ * @elf_ex:   ELF header of the binary whose section headers should be loaded
+ * @elf_file: the opened ELF binary file
+ *
+ * Loads ELF section header contents from the binary file elf_file, which has the ELF
+ * header pointed to by elf_ex, into a newly allocated array. The caller is
+ * responsible for freeing the allocated data. Returns an ERR_PTR upon failure.
+ */
+static char *load_elf_shcontents(struct elfhdr *elf_ex,
+			     struct elf_shdr *shdr,
+			     struct file *elf_file)
+{
+	char *shcontents = NULL;
+	int retval, size, err = -1;
+
+	/* ...and their total size. */
+	size = shdr->sh_size;
+	loff_t pos = shdr->sh_offset;
+
+	shcontents = kmalloc(size, GFP_KERNEL);
+	if (!shcontents)
+		goto out;
+
+	/* Read in the section headers */
+	retval = kernel_read(elf_file, shcontents, size, &pos);
+	if (retval != size) {
+		err = (retval < 0) ? retval : -EIO;
+		goto out;
+	}
+
+	/* Success! */
+	err = 0;
+out:
+	if (err) {
+		kfree(shcontents);
+		shcontents = NULL;
+	}
+	return shcontents;
+}
+
 #ifndef CONFIG_ARCH_BINFMT_ELF_STATE
 
 /**
@@ -998,15 +1039,15 @@ static int load_elf_binary(struct linux_binprm *bprm)
      */
     // TODO ensure that the elf_hook_module doesn't get removed during for loop execution
 	if (elf_shdata && elf_hook_module != NULL) {
-            printk("Value of elf_shdata: %d\n", elf_shdata->sh_name);
 	    for(i = 0, elf_spnt = elf_shdata;
 	        i < loc->elf_ex.e_shnum; i++, elf_spnt++) {
-                printk("Value of elf_spnt: %d\n", elf_spnt->sh_name);
                 char * section_name = strtbl + elf_spnt->sh_name;
-                printk("Value of section_name: %s\n", section_name);
                 if (strcmp((const char*) section_name, ".elf_hook_module_data") == 0) {
+		    char * section_contents = load_elf_shcontents(&loc->elf_ex, elf_spnt, bprm->file);
                     printk("Entering the module");
-                    elf_hook_module(elf_spnt);
+		    printk("Section contents (from kernel): %s\n", section_contents);
+                    elf_hook_module(section_contents);
+		    kfree(section_contents);
                 }
             }
         }
