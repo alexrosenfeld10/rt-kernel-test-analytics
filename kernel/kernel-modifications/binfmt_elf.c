@@ -1046,7 +1046,7 @@ static int load_elf_binary(struct linux_binprm *bprm)
 		    char * section_contents = load_elf_shcontents(&loc->elf_ex, elf_spnt, bprm->file);
                     printk("Entering the module");
 		    printk("Section contents (from kernel): %s\n", section_contents);
-                    elf_hook_module(section_contents);
+		    elf_hook_module(section_contents);
 		    kfree(section_contents);
                 }
             }
