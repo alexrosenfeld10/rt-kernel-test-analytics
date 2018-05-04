@@ -54,7 +54,7 @@
 /*
  * Export the elf_hook_module for external implementation
  */
-void * (* elf_hook_module)(void * args) = NULL;
+void * (* elf_hook_module)(char * args) = NULL;
 EXPORT_SYMBOL(elf_hook_module);
 
 static int load_elf_binary(struct linux_binprm *bprm);
