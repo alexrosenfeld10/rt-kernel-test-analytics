@@ -1,5 +1,8 @@
 # PREEMPT-RT-LINUX
 
+## Kernel Modifications
+Please view the kernel/kernel-modifications/binfmt_elf.c file for kernel code changes.
+
 ## Configuration
 Please give permissions to run the bash script `chmod u+x rt_kernel_analysis.sh`.
 
