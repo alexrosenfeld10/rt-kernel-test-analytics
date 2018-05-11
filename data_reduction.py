@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 '''
 data_reduction.py
 
@@ -14,7 +16,7 @@ import pandas as pd
 import os
 import errno, sys
 import glob
-
+import pudb
 
 '''
 Parser - comamnd line parser
@@ -33,6 +35,8 @@ def Parser():
                         nargs='+', help="Search task-pid name")
     parser.add_argument("-o", action='store', dest='output_folder',
                         help="Output created csv to folder")
+    parser.add_argument("--type", action='store', dest='log_type', default='',
+                        help="If you are profiling a batch of files of the same type, you can specify the type here so that the program does not have to programatically figure it out.")
 
     # store user input
     args = parser.parse_args()
@@ -43,10 +47,7 @@ def Parser():
     else:
         input_folder = args.input_folder
 
-    if args.search_pid == None:
-        sys.exit(errno.EACCES)
-    else:
-        search_pid = args.search_pid
+    search_pid = args.search_pid
 
     if args.output_folder == None:
         sys.exit(errno.EACCES)
@@ -54,8 +55,7 @@ def Parser():
         output_folder = args.output_folder
 
     # return output values
-    return input_folder, search_pid, output_folder
-
+    return input_folder, search_pid, output_folder, args.log_type
 
 '''
 PathFinder - determine the output folder
@@ -540,6 +540,68 @@ def PerfLog(filename):
         sys.exit(0)
 
 
+def PerfCacheLog(filename):
+    header = [
+        'Overhead',
+        'Parent Command',
+        'Shared Object',
+        'Kernel Object',
+        'Permission Level',
+        'Symbol'
+    ]
+
+    Overhead         = []
+    Parent_Command   = []
+    Shared_Object    = []
+    Kernel_Object    = []
+    Permission_Level = []
+    Symbol           = []
+
+    with open(filename) as f:
+        for line_num, line in enumerate(f):
+            fields = line.split()
+            if fields and len(fields) == 5 and fields[0] != '#' and fields[0] != '':
+                # strip out %
+                Overhead.append(fields[0][:-1])
+                Parent_Command.append(fields[1])
+
+                if '[' and ']' in fields[2]:
+                    Shared_Object.append(fields[2][1:-1])
+                    Kernel_Object.append(True)
+                else:
+                    Shared_Object.append(fields[2])
+                    Kernel_Object.append(False)
+
+                perm = fields[3][1]
+                if perm == 'k':
+                    Permission_Level.append('kernel')
+                elif perm == '.':
+                    Permission_Level.append('user')
+                elif perm == 'g':
+                    Permission_Level.append('guest')
+                elif perm == 'u':
+                    Permission_Level.append('guest os user space')
+                elif perm == 'H':
+                    Permission_Level.append('hypervisor')
+
+                Symbol.append(fields[4])
+
+    if len(Overhead) == len(Parent_Command) == len(Shared_Object) == len(Kernel_Object) == len(Permission_Level) == len(Symbol):
+        df = pd.DataFrame({
+            header[0]: Overhead,
+            header[1]: Parent_Command,
+            header[2]: Shared_Object,
+            header[3]: Kernel_Object,
+            header[4]: Permission_Level,
+            header[5]: Symbol
+        })
+        return df
+    else:
+        print("Error: Unhandled corner case, incomplete log output!")
+        sys.exit(1) 
+                
+
+
 '''
 LogType - return the log type
 
@@ -597,14 +659,19 @@ TODO: statistical data analysis using pandas
 @output: void
 '''
 def main():
-
     # command line parser
-    input_folder, search_pid, output_folder = Parser()
+    input_folder, search_pid, output_folder, log_type_param = Parser()
 
     # open folder to read file
     for filename in glob.glob(os.path.join(input_folder, '*.txt')):
         print("read " + filename)
-        logtype = LogType(filename)
+                                
+        logtype = ''
+        if log_type_param:
+            logtype = log_type_param
+        else:
+            logtype = LogType(filename)
+                                
         if logtype == 'ftrace_function':
             df = FtraceFunction(filename, search_pid)
         elif logtype == 'ftrace_graph':
@@ -618,6 +685,8 @@ def main():
             df = PerfLog(filename)
         elif logtype == 'perf_latency':
             df = PerfLatency(filename)
+        elif logtype == 'perf_cache_log':
+            df = PerfCacheLog(filename)
 
         output_filename, output_path = PathFinder(filename, output_folder)
         df.to_csv(output_path)
