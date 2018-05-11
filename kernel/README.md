@@ -36,3 +36,17 @@ In bb-kernel directory, build the kernel image by typing:
 
     $ ./build_kernel.sh
 Please see deploy directory to find the kernel. If you want to modify the source and rebuild the kernel, please type `./tools/rebuild.sh`.
+
+## How to Insert a New Section
+
+Use the following command lines to add a new section in executable file. This code is taken from [link](https://sourceware.org/ml/binutils/2008-06/msg00216.html).
+
+    $ echo 'int main() { puts ("Hello world"); }' | gcc -x c - -c -o hello.o
+    $ echo "this is my special data" > mydata
+    $ objcopy --add-section .elf_hook_module_data=mydata \
+              --set-section-flags .mydata=noload,readonly hello.o hello2.o
+    $ gcc hello2.o -o hello
+
+## How to Insert a New Module
+
+Please check elf_hook_module/README.md to see a new module and how to insert into our kernel.
