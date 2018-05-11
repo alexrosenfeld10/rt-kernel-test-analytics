@@ -1,7 +1,10 @@
 # PREEMPT-RT-LINUX
 
 ## Kernel Modifications
-Please view the kernel/kernel-modifications/binfmt_elf.c file for kernel code changes.
+
+We have modified the kernel to read section headers of ELF files and look for a specific header. If found, the kernel will attempt to run a module that alters program behavior based on the contents of the section header found in the elf file.
+
+Please check kernel/README.md to see how our modification works with a new section and a new module.
 
 ## Configuration
 Please give permissions to run the bash script `chmod u+x rt_kernel_analysis.sh`.
